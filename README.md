@@ -2,6 +2,7 @@ Hunt-Rest-ORM
 ==================================
 
 [![GoDoc](https://godoc.org/github.com/vodolaz095/hrorm?status.svg)](https://godoc.org/github.com/vodolaz095/hrorm)
+[![Build Status](https://travis-ci.org/vodolaz095/hrorm.svg?branch=master)](https://travis-ci.org/vodolaz095/hrorm)
 
 Go client for [HuntJS](https://huntjs.herokuapp.com) models exported by means of [REST interface
 ](http://huntjs.herokuapp.com/documentation/ExportModelToRestParameters.html).
