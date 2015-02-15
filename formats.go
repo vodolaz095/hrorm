@@ -1,5 +1,9 @@
 package hrorm
 
+// Metadata is related information to entities returned from
+// GetOne and Query requests. It have fields like current page, number of elements
+// in collection that match the query given,  the fields readable and writable for
+// single entity
 type Metadata struct {
 	ModelName      string            `json:"modelName"`
 	CanWrite       bool              `json:"canWrite"`
@@ -14,6 +18,7 @@ type Metadata struct {
 	Count          uint32            `json:"count"`
 }
 
+// Response error allows to parse erroneous responses in future
 type ResponseError struct {
 	Message string `json:"message"`
 	Field   string `json:"field"`

@@ -20,6 +20,7 @@ import (
 	"time"
 )
 
+// ORM is a structure, that represents single HuntJS REST API client
 type ORM struct {
 	ApiUrl  string
 	HuntKey string
