@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var someId string
+var someID string
 
 type Trophy struct {
 	ID       string `json:"id,omitempty"`
@@ -15,14 +15,14 @@ type Trophy struct {
 
 var someTrophy Trophy
 
-var apiUrl = "https://huntjs.herokuapp.com/api/v1/trophy"
+var apiURL = "https://huntjs.herokuapp.com/api/v1/trophy"
 
-//var apiUrl = "http://localhost:3000/api/v1/trophy"
+//var apiURL = "http://localhost:3000/api/v1/trophy"
 
 var huntKey = "i_am_game_master_grr"
 
 func TestQueryAll(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
 	metadata, err := hr.Query(parameters, &trophies)
@@ -35,7 +35,7 @@ func TestQueryAll(t *testing.T) {
 			if v.ID == "" {
 				t.Error("ID is not recieved!")
 			}
-			someId = v.ID
+			someID = v.ID
 			if v.Name == "" {
 				t.Error("Name is not recieved!")
 			}
@@ -80,7 +80,7 @@ func TestQueryAll(t *testing.T) {
 }
 
 func TestQuerySorted(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
 	parameters["itemsPerPage"] = "2"
@@ -94,7 +94,7 @@ func TestQuerySorted(t *testing.T) {
 				if v.ID == "" {
 					t.Error("ID is not recieved!")
 				}
-				someId = v.ID
+				someID = v.ID
 				if v.Name == "" {
 					t.Error("Name is not recieved!")
 				}
@@ -143,7 +143,7 @@ func TestQuerySorted(t *testing.T) {
 }
 
 func TestQueryFilteredById(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
 	parameters["_id"] = someTrophy.ID
@@ -156,7 +156,7 @@ func TestQueryFilteredById(t *testing.T) {
 				if v.ID == "" {
 					t.Error("ID is not recieved!")
 				}
-				someId = v.ID
+				someID = v.ID
 				if v.Name == "" {
 					t.Error("Name is not recieved!")
 				}
@@ -210,7 +210,7 @@ func TestQueryFilteredById(t *testing.T) {
 }
 
 func TestGetOneById(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var oneTrophy Trophy
 	metadata, err := hr.GetOne(someTrophy.ID, &oneTrophy)
 	if err != nil {
@@ -236,7 +236,7 @@ func TestGetOneById(t *testing.T) {
 }
 
 func TestCreateUpdateDelete(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
 	parameters["name"] = "John Doe"
@@ -316,7 +316,7 @@ func TestUpdateObjectWithoutId(t *testing.T) {
 		Priority: 100,
 		Scored:   false,
 	}
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	err := hr.Update(&newTrophy)
 	if err == nil {
 		t.Error("Error is not thrown!")
@@ -333,7 +333,7 @@ func TestDeleteObjectWithoutId(t *testing.T) {
 		Priority: 100,
 		Scored:   false,
 	}
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	err := hr.Delete(&newTrophy)
 	if err == nil {
 		t.Error("Error is not thrown!")
