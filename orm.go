@@ -30,7 +30,7 @@ type ORM struct {
 }
 
 // New is a constructor, it builds ready to use ORM client instances
-// accepting strings of `apiUrl` and `huntKey`
+// accepting strings of `apiUrl`, `huntKey` and `debug` boolean
 func New(apiUrl, huntKey string, debug bool) ORM {
 	return ORM{
 		ApiUrl:  apiUrl,
@@ -74,10 +74,10 @@ func makeError(statusCode int) error {
 	var e error
 	switch statusCode {
 	case 400:
-		e = errors.New("Unauthorized")
+		e = errors.New("Bad Request")
 		break
 	case 401:
-		e = errors.New("Bad Request")
+		e = errors.New("Unauthorized")
 		break
 	case 403:
 		e = errors.New("Access denied")

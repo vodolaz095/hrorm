@@ -17,6 +17,8 @@ var someTrophy Trophy
 
 var apiUrl string = "https://huntjs.herokuapp.com/api/v1/trophy"
 
+//var apiUrl string = "http://localhost:3000/api/v1/trophy"
+
 var huntKey string = "i_am_game_master_grr"
 
 func TestQueryAll(t *testing.T) {
