@@ -18,7 +18,7 @@ type Metadata struct {
 	Count          uint32            `json:"count"`
 }
 
-// Response error allows to parse erroneous responses in future
+// ResponseError allows to parse erroneous responses in future versions
 type ResponseError struct {
 	Message string `json:"message"`
 	Field   string `json:"field"`
@@ -31,6 +31,6 @@ type responseParsed struct {
 	Error    []ResponseError `json:"errors"`
 	Mtd      Metadata        `json:"metadata"`
 	Data     interface{}     `json:"data"`
-	Id       string          `json:"id"`
+	ID       string          `json:"id"`
 	Location string          `json:"location"`
 }

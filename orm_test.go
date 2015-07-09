@@ -7,7 +7,7 @@ import (
 var someId string
 
 type Trophy struct {
-	Id       string `json:"id,omitempty"`
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name"`
 	Scored   bool   `json:"scored"`
 	Priority int    `json:"priority"`
@@ -15,11 +15,11 @@ type Trophy struct {
 
 var someTrophy Trophy
 
-var apiUrl string = "https://huntjs.herokuapp.com/api/v1/trophy"
+var apiUrl = "https://huntjs.herokuapp.com/api/v1/trophy"
 
-//var apiUrl string = "http://localhost:3000/api/v1/trophy"
+//var apiUrl = "http://localhost:3000/api/v1/trophy"
 
-var huntKey string = "i_am_game_master_grr"
+var huntKey = "i_am_game_master_grr"
 
 func TestQueryAll(t *testing.T) {
 	hr := New(apiUrl, huntKey, true)
@@ -28,54 +28,55 @@ func TestQueryAll(t *testing.T) {
 	metadata, err := hr.Query(parameters, &trophies)
 	if err != nil {
 		t.Error("We have issues contacting API " + err.Error())
-	} else {
-		if len(trophies) > 0 {
-			for _, v := range trophies {
-				if v.Id == "" {
-					t.Error("Id is not recieved!")
-				}
-				someId = v.Id
-				if v.Name == "" {
-					t.Error("Name is not recieved!")
-				}
-				if !(v.Scored == true || v.Scored == false) {
-					t.Error("Scored is not recieved!")
-				}
-				if v.Priority < 0 {
-					t.Error("Priority is not recieved!")
-				}
-				someTrophy = v
-			}
-		} else {
-			t.Error("API returned 0 items!")
-		}
-		/*
-			"metadata":{
-				"modelName":"Trophy",
-				"fieldsAccessible":["id","name","scored","priority"],
-				"filter":{},
-				"page":1,
-				"sort":"-_id",
-				"itemsPerPage":10,
-				"numberOfPages":1,
-				"count":6
-				}
-		*/
-		if metadata.ModelName != "Trophy" {
-			t.Error("We recieved model of " + metadata.ModelName + " not `Trophy`")
-		}
-		if metadata.Sort != "-_id" {
-			t.Error("We are sorting by " + metadata.Sort + " while we need to sort by  `-_id`")
-		}
-
-		if int(metadata.ItemsPerPage) < len(trophies) {
-			t.Error("We recieved wrong itemsPerPage!")
-		}
-
-		if metadata.Count < 0 {
-			t.Error("We recieved  wrong number of items!")
-		}
 	}
+
+	if len(trophies) > 0 {
+		for _, v := range trophies {
+			if v.ID == "" {
+				t.Error("ID is not recieved!")
+			}
+			someId = v.ID
+			if v.Name == "" {
+				t.Error("Name is not recieved!")
+			}
+			if !(v.Scored == true || v.Scored == false) {
+				t.Error("Scored is not recieved!")
+			}
+			if v.Priority < 0 {
+				t.Error("Priority is not recieved!")
+			}
+			someTrophy = v
+		}
+	} else {
+		t.Error("API returned 0 items!")
+	}
+	/*
+		"metadata":{
+			"modelName":"Trophy",
+			"fieldsAccessible":["id","name","scored","priority"],
+			"filter":{},
+			"page":1,
+			"sort":"-_id",
+			"itemsPerPage":10,
+			"numberOfPages":1,
+			"count":6
+			}
+	*/
+	if metadata.ModelName != "Trophy" {
+		t.Error("We recieved model of " + metadata.ModelName + " not `Trophy`")
+	}
+	if metadata.Sort != "-_id" {
+		t.Error("We are sorting by " + metadata.Sort + " while we need to sort by  `-_id`")
+	}
+
+	if int(metadata.ItemsPerPage) < len(trophies) {
+		t.Error("We recieved wrong itemsPerPage!")
+	}
+
+	if metadata.Count < 0 {
+		t.Error("We recieved  wrong number of items!")
+	}
+
 }
 
 func TestQuerySorted(t *testing.T) {
@@ -90,10 +91,10 @@ func TestQuerySorted(t *testing.T) {
 	} else {
 		if len(trophies) > 0 {
 			for _, v := range trophies {
-				if v.Id == "" {
-					t.Error("Id is not recieved!")
+				if v.ID == "" {
+					t.Error("ID is not recieved!")
 				}
-				someId = v.Id
+				someId = v.ID
 				if v.Name == "" {
 					t.Error("Name is not recieved!")
 				}
@@ -145,17 +146,17 @@ func TestQueryFilteredById(t *testing.T) {
 	hr := New(apiUrl, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
-	parameters["_id"] = someTrophy.Id
+	parameters["_id"] = someTrophy.ID
 	metadata, err := hr.Query(parameters, &trophies)
 	if err != nil {
 		t.Error("We have issues contacting API " + err.Error())
 	} else {
 		if len(trophies) > 0 {
 			for _, v := range trophies {
-				if v.Id == "" {
-					t.Error("Id is not recieved!")
+				if v.ID == "" {
+					t.Error("ID is not recieved!")
 				}
-				someId = v.Id
+				someId = v.ID
 				if v.Name == "" {
 					t.Error("Name is not recieved!")
 				}
@@ -182,7 +183,7 @@ func TestQueryFilteredById(t *testing.T) {
 				"count":6
 				}
 		*/
-		if metadata.Filter["_id"] != someTrophy.Id {
+		if metadata.Filter["_id"] != someTrophy.ID {
 			t.Error("We were unable to parse filter!")
 		}
 
@@ -211,11 +212,11 @@ func TestQueryFilteredById(t *testing.T) {
 func TestGetOneById(t *testing.T) {
 	hr := New(apiUrl, huntKey, true)
 	var oneTrophy Trophy
-	metadata, err := hr.GetOne(someTrophy.Id, &oneTrophy)
+	metadata, err := hr.GetOne(someTrophy.ID, &oneTrophy)
 	if err != nil {
 		t.Error("We have issues contacting API " + err.Error())
 	} else {
-		if oneTrophy.Id != someTrophy.Id {
+		if oneTrophy.ID != someTrophy.ID {
 			t.Error("We get wrong Trophy")
 		}
 		if oneTrophy.Name != someTrophy.Name {
@@ -245,7 +246,7 @@ func TestCreateUpdateDelete(t *testing.T) {
 	}
 
 	newTrophy := Trophy{
-		Id:       "", //new entry!
+		ID:       "", //new entry!
 		Name:     "John Doe",
 		Priority: 100,
 		Scored:   false,
@@ -262,10 +263,10 @@ func TestCreateUpdateDelete(t *testing.T) {
 			if err1 != nil {
 				t.Error("We have error creating - " + err1.Error())
 			} else {
-				if nt.Id != id {
+				if nt.ID != id {
 					t.Error("We recieved wrong id")
 				}
-				if newTrophy.Id != id {
+				if newTrophy.ID != id {
 					t.Error("The id is not updated!")
 				}
 
@@ -283,7 +284,7 @@ func TestCreateUpdateDelete(t *testing.T) {
 				if err3 != nil {
 					t.Error("We have error updating - " + err3.Error())
 				}
-				if nt.Id != id {
+				if nt.ID != id {
 					t.Error("We recieved wrong id")
 				}
 				if nt.Name != newTrophy.Name {
@@ -310,7 +311,7 @@ func TestCreateUpdateDelete(t *testing.T) {
 
 func TestUpdateObjectWithoutId(t *testing.T) {
 	newTrophy := Trophy{
-		Id:       "", //new entry!
+		ID:       "", //new entry!
 		Name:     "John Doe",
 		Priority: 100,
 		Scored:   false,
@@ -320,14 +321,14 @@ func TestUpdateObjectWithoutId(t *testing.T) {
 	if err == nil {
 		t.Error("Error is not thrown!")
 	}
-	if err.Error() != "Object does not have the `Id` field! It cannot be saved!" {
-		t.Error("We recieved a bad error!")
+	if err.Error() != "Object does not have the `ID` field! It cannot be saved!" {
+		t.Error("We recieved a bad error!", err.Error())
 	}
 }
 
 func TestDeleteObjectWithoutId(t *testing.T) {
 	newTrophy := Trophy{
-		Id:       "", //new entry!
+		ID:       "", //new entry!
 		Name:     "John Doe",
 		Priority: 100,
 		Scored:   false,
@@ -337,7 +338,7 @@ func TestDeleteObjectWithoutId(t *testing.T) {
 	if err == nil {
 		t.Error("Error is not thrown!")
 	}
-	if err.Error() != "Object does not have the `Id` field! It cannot be saved!" {
+	if err.Error() != "Object does not have the `ID` field! It cannot be saved!" {
 		t.Error("We recieved a bad error!")
 	}
 
