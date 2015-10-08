@@ -22,7 +22,7 @@ import (
 
 // ORM is a structure, that represents single HuntJS REST API client
 type ORM struct {
-	ApiUrl  string
+	APIURL  string
 	HuntKey string
 	HuntSid string
 	Csrf    string
@@ -30,10 +30,10 @@ type ORM struct {
 }
 
 // New is a constructor, it builds ready to use ORM client instances
-// accepting strings of `apiUrl` and `huntKey`
-func New(apiUrl, huntKey string, debug bool) ORM {
+// accepting strings of `apiURL`, `huntKey` and `debug` boolean
+func New(apiURL, huntKey string, debug bool) ORM {
 	return ORM{
-		ApiUrl:  apiUrl,
+		APIURL:  apiURL,
 		HuntKey: huntKey,
 		HuntSid: "",
 		Csrf:    "",
@@ -114,11 +114,11 @@ func (o *ORM) Query(parameters map[string]string, data interface{}) (Metadata, e
 		queryString = queryString + fmt.Sprintf("%v=%v&", url.QueryEscape(k), url.QueryEscape(v))
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%v?%v", o.ApiUrl, queryString), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%v?%v", o.APIURL, queryString), nil)
 	o.prepareRequest(req)
 	if o.Debug {
 		fmt.Println("---------------------------------------------")
-		fmt.Println(fmt.Sprintf("HuntJS ORM - [GET] %v?%v ...", o.ApiUrl, queryString))
+		fmt.Println(fmt.Sprintf("HuntJS ORM - [GET] %v?%v ...", o.APIURL, queryString))
 	}
 
 	if err != nil {
@@ -134,14 +134,12 @@ func (o *ORM) Query(parameters map[string]string, data interface{}) (Metadata, e
 		raw, err2 := ioutil.ReadAll(res.Body)
 		if err2 != nil {
 			return Metadata{}, err2
-		} else {
-			err2 = json.Unmarshal(raw, &rP)
-			data = rP.Data
-			return rP.Mtd, nil
 		}
-	} else {
-		return Metadata{}, makeError(res.StatusCode)
+		err2 = json.Unmarshal(raw, &rP)
+		data = rP.Data
+		return rP.Mtd, nil
 	}
+	return Metadata{}, makeError(res.StatusCode)
 }
 
 // GetOne item by `id` provided and marshal it into `data`
@@ -152,10 +150,10 @@ func (o *ORM) GetOne(id string, data interface{}) (Metadata, error) {
 		Data:   data,
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%v/%v", o.ApiUrl, id), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%v/%v", o.APIURL, id), nil)
 	if o.Debug {
 		fmt.Println("---------------------------------------------")
-		fmt.Println(fmt.Sprintf("HuntJS ORM - [GET] %v/%v ...", o.ApiUrl, id))
+		fmt.Println(fmt.Sprintf("HuntJS ORM - [GET] %v/%v ...", o.APIURL, id))
 	}
 	o.prepareRequest(req)
 	if err != nil {
@@ -171,14 +169,12 @@ func (o *ORM) GetOne(id string, data interface{}) (Metadata, error) {
 		raw, err2 := ioutil.ReadAll(res.Body)
 		if err2 != nil {
 			return Metadata{}, err2
-		} else {
-			err2 = json.Unmarshal(raw, &rP)
-			data = rP.Data
-			return rP.Mtd, nil
 		}
-	} else {
-		return Metadata{}, makeError(res.StatusCode)
+		err2 = json.Unmarshal(raw, &rP)
+		data = rP.Data
+		return rP.Mtd, nil
 	}
+	return Metadata{}, makeError(res.StatusCode)
 }
 
 // Create - function to create new item by marshaling `data` provided
@@ -194,10 +190,10 @@ func (o *ORM) Create(data interface{}) (string, error) {
 	if err0 != nil {
 		return "", err0
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%v", o.ApiUrl), bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%v", o.APIURL), bytes.NewBuffer(body))
 	if o.Debug {
 		fmt.Println("---------------------------------------------")
-		fmt.Println(fmt.Sprintf("HuntJS ORM - [POST] %v ...", o.ApiUrl))
+		fmt.Println(fmt.Sprintf("HuntJS ORM - [POST] %v ...", o.APIURL))
 	}
 	o.prepareRequest(req)
 	if err != nil {
@@ -215,11 +211,8 @@ func (o *ORM) Create(data interface{}) (string, error) {
 		id = parts[len(parts)-1]
 		_, err2 := o.GetOne(id, &data)
 		return id, err2
-	} else {
-		return "", makeError(res.StatusCode)
 	}
-
-	return "", nil
+	return "", makeError(res.StatusCode)
 }
 
 // Update the current entry in database by marshaling the `data` provided.
@@ -231,36 +224,34 @@ func (o *ORM) Create(data interface{}) (string, error) {
 // See https://en.wikipedia.org/wiki/Cross-site_request_forgery
 func (o *ORM) Update(data interface{}) error {
 	//https://stackoverflow.com/questions/27992821/how-get-pointer-of-structs-member-from-interface-reflection-golang
-	id := string(reflect.ValueOf(data).Elem().FieldByName("Id").String())
+	id := string(reflect.ValueOf(data).Elem().FieldByName("ID").String())
 	if id == "" {
-		return errors.New("Object does not have the `Id` field! It cannot be saved!")
-	} else {
-		client := &http.Client{}
-		body, err0 := json.Marshal(data)
-		if err0 != nil {
-			return err0
-		}
-		req, err := http.NewRequest("PUT", fmt.Sprintf("%v/%v", o.ApiUrl, id), bytes.NewBuffer(body))
-		if o.Debug {
-			fmt.Println("---------------------------------------------")
-			fmt.Println(fmt.Sprintf("HuntJS ORM - [PUT] %v/%v ...", o.ApiUrl, id))
-		}
-		o.prepareRequest(req)
-		if err != nil {
-			return err
-		}
-		res, err1 := client.Do(req)
-		defer res.Body.Close()
-		if err1 != nil {
-			return err1
-		}
-		o.extractFromResponse(res)
-		if res.StatusCode == 200 {
-			return nil
-		} else {
-			return makeError(res.StatusCode)
-		}
+		return errors.New("Object does not have the `ID` field! It cannot be saved!")
 	}
+	client := &http.Client{}
+	body, err0 := json.Marshal(data)
+	if err0 != nil {
+		return err0
+	}
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%v/%v", o.APIURL, id), bytes.NewBuffer(body))
+	if o.Debug {
+		fmt.Println("---------------------------------------------")
+		fmt.Println(fmt.Sprintf("HuntJS ORM - [PUT] %v/%v ...", o.APIURL, id))
+	}
+	o.prepareRequest(req)
+	if err != nil {
+		return err
+	}
+	res, err1 := client.Do(req)
+	defer res.Body.Close()
+	if err1 != nil {
+		return err1
+	}
+	o.extractFromResponse(res)
+	if res.StatusCode == 200 {
+		return nil
+	}
+	return makeError(res.StatusCode)
 }
 
 // Delete entity
@@ -271,30 +262,28 @@ func (o *ORM) Update(data interface{}) error {
 // Enabling CSRF protection greatly increases security of site
 // See https://en.wikipedia.org/wiki/Cross-site_request_forgery
 func (o *ORM) Delete(data interface{}) error {
-	id := string(reflect.ValueOf(data).Elem().FieldByName("Id").String())
+	id := string(reflect.ValueOf(data).Elem().FieldByName("ID").String())
 	if id == "" {
-		return errors.New("Object does not have the `Id` field! It cannot be saved!")
-	} else {
-		client := &http.Client{}
-		req, err := http.NewRequest("DELETE", fmt.Sprintf("%v/%v", o.ApiUrl, id), nil)
-		if o.Debug {
-			fmt.Println("---------------------------------------------")
-			fmt.Println(fmt.Sprintf("HuntJS ORM - [DELETE] %v/%v ...", o.ApiUrl, id))
-		}
-		o.prepareRequest(req)
-		if err != nil {
-			return err
-		}
-		res, err1 := client.Do(req)
-		defer res.Body.Close()
-		if err1 != nil {
-			return err1
-		}
-		o.extractFromResponse(res)
-		if res.StatusCode == 200 {
-			return nil
-		} else {
-			return makeError(res.StatusCode)
-		}
+		return errors.New("Object does not have the `ID` field! It cannot be saved!")
 	}
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%v/%v", o.APIURL, id), nil)
+	if o.Debug {
+		fmt.Println("---------------------------------------------")
+		fmt.Println(fmt.Sprintf("HuntJS ORM - [DELETE] %v/%v ...", o.APIURL, id))
+	}
+	o.prepareRequest(req)
+	if err != nil {
+		return err
+	}
+	res, err1 := client.Do(req)
+	defer res.Body.Close()
+	if err1 != nil {
+		return err1
+	}
+	o.extractFromResponse(res)
+	if res.StatusCode == 200 {
+		return nil
+	}
+	return makeError(res.StatusCode)
 }
