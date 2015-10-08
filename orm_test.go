@@ -15,8 +15,8 @@ type Trophy struct {
 
 var someTrophy Trophy
 
-//var apiUrl string = "https://huntjs.herokuapp.com/api/v1/trophy"
-var apiUrl string = "http://localhost:3000/api/v1/trophy"
+//var apiURL string = "https://huntjs.herokuapp.com/api/v1/trophy"
+var apiURL string = "http://localhost:3000/api/v1/trophy"
 
 var huntKey = "i_am_game_master_grr"
 
@@ -309,7 +309,7 @@ func TestCreateUpdateDelete(t *testing.T) {
 }
 
 func TestCreateUpdateFailDelete(t *testing.T) {
-	hr := New(apiUrl, huntKey, true)
+	hr := New(apiURL, huntKey, true)
 	var trophies []Trophy
 	parameters := make(map[string]string)
 	parameters["name"] = "John Doe"
@@ -319,7 +319,7 @@ func TestCreateUpdateFailDelete(t *testing.T) {
 	}
 
 	newTrophy := Trophy{
-		Id:       "", //new entry!
+		ID:       "", //new entry!
 		Name:     "John Doe",
 		Priority: 100,
 		Scored:   false,
@@ -336,10 +336,10 @@ func TestCreateUpdateFailDelete(t *testing.T) {
 			if err1 != nil {
 				t.Error("We have error creating - " + err1.Error())
 			} else {
-				if nt.Id != id {
+				if nt.ID != id {
 					t.Error("We recieved wrong id")
 				}
-				if newTrophy.Id != id {
+				if newTrophy.ID != id {
 					t.Error("The id is not updated!")
 				}
 
@@ -349,15 +349,15 @@ func TestCreateUpdateFailDelete(t *testing.T) {
 				//update
 				newTrophy.Priority = -10
 				err2 := hr.Update(&newTrophy)
-				if err2 != nil {
-					t.Error("We have error updating - " + err2.Error())
+				if err2.Error() != "Bad Request" {
+					t.Error("We have invalid error updating - " + err2.Error())
 				}
 				//get
 				_, err3 := hr.GetOne(id, &nt)
 				if err3 != nil {
 					t.Error("We have error updating - " + err3.Error())
 				}
-				if nt.Id != id {
+				if nt.ID != id {
 					t.Error("We recieved wrong id")
 				}
 				if nt.Name != newTrophy.Name {
