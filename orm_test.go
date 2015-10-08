@@ -1,6 +1,7 @@
 package hrorm
 
 import (
+	"os"
 	"testing"
 )
 
@@ -14,11 +15,21 @@ type Trophy struct {
 }
 
 var someTrophy Trophy
-
-//var apiURL string = "https://huntjs.herokuapp.com/api/v1/trophy"
-var apiURL string = "http://localhost:3000/api/v1/trophy"
-
+var apiURL string
 var huntKey = "i_am_game_master_grr"
+
+func TestSetEnvironment(t *testing.T) {
+	isTravis := os.Getenv("IS_TRAVIS")
+	if isTravis != "" {
+		if isTravis == "YES" {
+			apiURL = "https://huntjs.herokuapp.com/api/v1/trophy"
+		} else {
+			t.Error("We need environment value `IS_TRAVIS` set to `YES`")
+		}
+	} else {
+		apiURL = "http://localhost:3000/api/v1/trophy"
+	}
+}
 
 func TestQueryAll(t *testing.T) {
 	hr := New(apiURL, huntKey, true)
@@ -205,7 +216,6 @@ func TestQueryFilteredById(t *testing.T) {
 			t.Error("We recieved  wrong number of items!")
 		}
 	}
-
 }
 
 func TestGetOneById(t *testing.T) {
@@ -230,7 +240,6 @@ func TestGetOneById(t *testing.T) {
 		if &metadata == nil {
 			t.Error("We got emtpy metadata!")
 		}
-
 	}
 }
 
@@ -303,7 +312,6 @@ func TestCreateUpdateDelete(t *testing.T) {
 					t.Error("We got item, so the item is not deleted!")
 				}
 			}
-
 		}
 	}
 }
@@ -377,7 +385,6 @@ func TestCreateUpdateFailDelete(t *testing.T) {
 					t.Error("We got item, so the item is not deleted!")
 				}
 			}
-
 		}
 	}
 }
@@ -414,5 +421,4 @@ func TestDeleteObjectWithoutId(t *testing.T) {
 	if err.Error() != "Object does not have the `ID` field! It cannot be saved!" {
 		t.Error("We recieved a bad error!")
 	}
-
 }
