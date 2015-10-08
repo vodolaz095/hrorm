@@ -66,7 +66,9 @@ func (o *ORM) extractFromResponse(res *http.Response) {
 		fmt.Printf("HuntSid %v\n", o.HuntSid)
 		h, m, s := time.Now().Clock()
 		fmt.Printf("Response completed at %v:%v:%v\n", h, m, s)
-		fmt.Println("---------------------------------------------\n\n")
+		fmt.Println("---------------------------------------------")
+		fmt.Println()
+		fmt.Println()
 	}
 }
 
