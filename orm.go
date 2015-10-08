@@ -74,10 +74,10 @@ func makeError(statusCode int) error {
 	var e error
 	switch statusCode {
 	case 400:
-		e = errors.New("Unauthorized")
+		e = errors.New("Bad Request")
 		break
 	case 401:
-		e = errors.New("Bad Request")
+		e = errors.New("Unauthorized")
 		break
 	case 403:
 		e = errors.New("Access denied")

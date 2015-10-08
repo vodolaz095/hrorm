@@ -15,7 +15,8 @@ type Trophy struct {
 
 var someTrophy Trophy
 
-var apiUrl string = "https://huntjs.herokuapp.com/api/v1/trophy"
+//var apiUrl string = "https://huntjs.herokuapp.com/api/v1/trophy"
+var apiUrl string = "http://localhost:3000/api/v1/trophy"
 
 var huntKey string = "i_am_game_master_grr"
 
@@ -289,6 +290,80 @@ func TestCreateUpdateDelete(t *testing.T) {
 				}
 				if nt.Priority != 10 {
 					t.Error("The priority is not updated!")
+				}
+
+				//delete
+				err4 := hr.Delete(&newTrophy)
+				if err4 != nil {
+					t.Error("We have error deleting - " + err4.Error())
+				}
+				_, err5 := hr.GetOne(id, &nt)
+				if err5.Error() != "Not found" {
+					t.Error("We got item, so the item is not deleted!")
+				}
+			}
+
+		}
+	}
+}
+
+func TestCreateUpdateFailDelete(t *testing.T) {
+	hr := New(apiUrl, huntKey, true)
+	var trophies []Trophy
+	parameters := make(map[string]string)
+	parameters["name"] = "John Doe"
+	metadata, err := hr.Query(parameters, &trophies)
+	if metadata.Count > 0 {
+		t.Error("We found wrong trophy!")
+	}
+
+	newTrophy := Trophy{
+		Id:       "", //new entry!
+		Name:     "John Doe",
+		Priority: 100,
+		Scored:   false,
+	}
+	id, err := hr.Create(&newTrophy)
+	if err != nil {
+		t.Error("We have error creating - " + err.Error())
+	} else {
+		if id == "" {
+			t.Error("We haven't recieved the id!")
+		} else {
+			var nt Trophy
+			_, err1 := hr.GetOne(id, &nt)
+			if err1 != nil {
+				t.Error("We have error creating - " + err1.Error())
+			} else {
+				if nt.Id != id {
+					t.Error("We recieved wrong id")
+				}
+				if newTrophy.Id != id {
+					t.Error("The id is not updated!")
+				}
+
+				if nt.Name != newTrophy.Name {
+					t.Error("We recieved wrong name")
+				}
+				//update
+				newTrophy.Priority = -10
+				err2 := hr.Update(&newTrophy)
+				if err2 != nil {
+					t.Error("We have error updating - " + err2.Error())
+				}
+				//get
+				_, err3 := hr.GetOne(id, &nt)
+				if err3 != nil {
+					t.Error("We have error updating - " + err3.Error())
+				}
+				if nt.Id != id {
+					t.Error("We recieved wrong id")
+				}
+				if nt.Name != newTrophy.Name {
+					t.Error("We recieved wrong name")
+				}
+				if nt.Priority != 100 {
+					t.Error("The priority is updated, when it have to be the same!")
 				}
 
 				//delete
